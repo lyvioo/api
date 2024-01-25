@@ -6,7 +6,7 @@ const header = require("./pdfHeader/pdfHeader");
 const onlineDevices = require("./pdfBodys/onlineDevices");
 const usersLogged = require("./pdfBodys/usersLogged");
 const machineLHistory = require("./pdfBodys/machineLHistory");
-const footer = require("./pdfFooter/footer");
+const footer = require("./pdfFooter/footer")
 
 function generatePDFBody(doc, data) {
     if (data && Array.isArray(data.systems)) {
@@ -14,7 +14,6 @@ function generatePDFBody(doc, data) {
     } else if (data && data.usersLogged && Array.isArray(data.usersLogged)) {
         usersLogged(doc, data.usersLogged);
     } else if (data && data.machineLHistory && Array.isArray(data.machineLHistory)) {
-        // Chamada da função para gerar o PDF de histórico de máquinas
         machineLHistory(doc, data.machineLHistory);
     } else {
         throw new Error('Dados inválidos fornecidos');
@@ -22,11 +21,12 @@ function generatePDFBody(doc, data) {
 }
 
 
+
 if (!fs.existsSync(pdfsPath)) {
     fs.mkdirSync(pdfsPath, { recursive: true });
 }
 
-async function generatePDF(reportData, data, dbEngenharia) {
+async function generatePDF(reportData, data, req) {
     const fileName = `report-${Date.now()}.pdf`;
     const filePath = path.join(pdfsPath, fileName);
 
@@ -36,10 +36,15 @@ async function generatePDF(reportData, data, dbEngenharia) {
         margins: { top: 20, bottom: 20, left: 20, right: 20 },
     });
 
+    // Configurar o evento 'pageAdded' antes de começar a adicionar conteúdo
+    /* doc.on('pageAdded', () => {
+        footer(doc);
+    }); */
+
     const writeStream = fs.createWriteStream(filePath);
     doc.pipe(writeStream);
 
-    await header(doc, reportData, dbEngenharia); 
+    await header(doc, reportData, req);
     generatePDFBody(doc, data);
 
     const totalNumberOfPages = doc.bufferedPageRange().count;
