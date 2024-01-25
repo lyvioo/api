@@ -106,5 +106,5 @@ const updateScheduledTasks = async () => {
   await scheduleTasks();
 };
 
-setInterval(updateScheduledTasks, 30000); //30 segundos
+setInterval(updateScheduledTasks, 20000); //20 segundos
 updateScheduledTasks();
