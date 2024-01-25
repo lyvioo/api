@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // Função para adicionar os dados enviados a uma array no MongoDB
-async function addToArrayInMongo(data) {
+async function addToArrayInMongo(req, data) {
     try {
         const dbEngenharia = await req.app.locals.dbEngenhariaTest;
         const db = dbEngenharia.db('PreEngenharia');
@@ -26,19 +26,9 @@ router.post('/', async (req, res) => {
     try {
         const smtpConfig = req.body;
 
-        const dbEngenharia = await req.app.locals.dbEngenhariaTest;
-        const db = dbEngenharia.db('PreEngenharia');
-        const collection = db.collection('smtpConfigRoutes');
+        // Chama a função 'addToArrayInMongo' passando 'req' e 'smtpConfig'
+        await addToArrayInMongo(req, smtpConfig);
 
-        // Estrutura da query modificada para adicionar a um array
-        const query = { configId: 'unique_config_id' };
-        const update = { $push: { smtpConfigs: smtpConfig } };
-        const options = { upsert: true };
-
-        const result = await collection.updateOne(query, update, options);
-        console.log(`Array de configurações SMTP atualizado com sucesso: ${result}`);
-
-        await addToArrayInMongo(smtpConfig);
         res.status(200).send('Configuração SMTP adicionada ao array no MongoDB.');
     } catch (error) {
         console.error('Erro:', error);
